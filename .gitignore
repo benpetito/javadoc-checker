@@ -30,3 +30,4 @@ replay_pid*
 /target/
 /output-reports/
 JavadocChecker.jar
+repo_list.txt

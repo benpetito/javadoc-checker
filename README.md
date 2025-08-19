@@ -17,21 +17,14 @@ JavadocChecker is a tool for scanning Java projects to check for missing Javadoc
 
 ## Usage
 
-### 1. Build the JAR
 
-Run the provided shell script to build the JavadocChecker fat JAR using Maven:
+### 1. Build the JAR and Run Against Local Workspace
+
+To build the JavadocChecker fat JAR and scan all projects under your local workspace (default: `~/workspace`):
 
 ```bash
 ./run_javadoc_checker.sh
 ```
-
-This will:
-- Compile the JAR using Maven
-- Copy the fat JAR to the project root
-- Scan all projects under your workspace directory (default: `~/workspace`)
-- Generate CSV reports in the `output-reports/` directory
-
-### 2. Specify a Custom Workspace (Optional)
 
 You can specify a different workspace path:
 
@@ -39,10 +32,37 @@ You can specify a different workspace path:
 ./run_javadoc_checker.sh /path/to/your/workspace
 ```
 
-### 3. Output
-
+**Output:**
 - Individual project reports: `output-reports/<project>_javadoc_report.csv`
 - Summary report: `output-reports/summary.csv`
+
+### 2. Compare Javadoc Coverage Between Last Year and Now
+
+To compare Javadoc coverage between a commit from last year and the latest commit for a set of repositories, use the new script:
+
+1. Create a text file (e.g. `repo_list.txt`) with one repository URL per line:
+
+	```
+	https://github.com/example/repo1.git
+	https://github.com/example/repo2.git
+	...
+	```
+
+2. Run the comparison script:
+
+	```bash
+	./run_javadoc_compare.sh repo_list.txt
+	```
+
+This will:
+- Clone each repository into a new directory under `./javadoc_compare_repos/`
+- For each repo, check out the last commit before Jan 1, 2025, run the checker, and record results
+- Check out the latest commit, run the checker, and record results
+- Write a summary CSV with both previous and current coverage columns: `output-reports/summary.csv`
+
+**Output:**
+- Previous and current coverage for each repo: `output-reports/summary.csv`
+- Per-repo reports for each state: `output-reports/<repo>_prev.csv` and `output-reports/<repo>_curr.csv`
 
 ## Customisation
 
@@ -55,5 +75,10 @@ See [LICENSE](LICENSE) for details.
 
 ## Troubleshooting
 
+
+- If you get a "Permission denied" error when trying to run a shell script, add execute permissions with:
+	```bash
+	chmod +x run_javadoc_checker.sh run_javadoc_compare.sh
+	```
 - If the script cannot find the fat JAR, ensure the Maven Shade plugin is set up correctly in `pom.xml`.
 - Only projects with a `src/main/java/modules` directory are scanned.
